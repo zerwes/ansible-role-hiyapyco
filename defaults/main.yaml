@@ -1,0 +1,10 @@
+---
+hiyapyco_remove_aptrepos:
+  - repo: deb http://repo.zero-sys.net/hiyapyco/deb ./
+
+hiyapyco_aptrepos:
+  - repo: deb [signed-by=/usr/share/keyrings/hiyapyco.asc] http://repo.zero-sys.net/hiyapyco/deb ./
+    key: hiyapyco.asc
+
+hiyapyco_packages:
+  - python3-hiyapyco

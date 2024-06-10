@@ -1,0 +1,35 @@
+# vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
+---
+
+- name: Remove hiyapyco apt repos
+  ansible.builtin.apt_repository:
+    repo: "{{ item.repo }}"
+    update_cache: true
+    state: absent
+    filename: hiyapyco
+  with_items: "{{ hiyapyco_remove_aptrepos }}"
+
+- name: Install required packages
+  ansible.builtin.apt:
+    name: gpg
+    update_cache: true
+
+- name: Copy hiyapyco apt keys
+  ansible.builtin.copy:
+    src: "{{ item.key }}"
+    dest: "/usr/share/keyrings/{{ item.key }}"
+    owner: root
+    mode: '0644'
+  with_items: "{{ hiyapyco_aptrepos }}"
+
+- name: Create hiyapyco apt repos
+  ansible.builtin.apt_repository:
+    repo: "{{ item.repo }}"
+    update_cache: true
+    filename: hiyapyco
+  with_items: "{{ hiyapyco_aptrepos }}"
+
+- name: Install hiyapyco packages
+  ansible.builtin.apt:
+    name: "{{ hiyapyco_packages }}"
+    update_cache: true
