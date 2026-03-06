@@ -1,6 +1,11 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
 ---
 
+- name: Install required packages
+  ansible.builtin.apt:
+    name: gpg
+    update_cache: true
+
 - name: Remove hiyapyco apt repos
   ansible.builtin.apt_repository:
     repo: "{{ item.repo }}"
@@ -8,11 +13,6 @@
     state: absent
     filename: hiyapyco
   with_items: "{{ hiyapyco_remove_aptrepos }}"
-
-- name: Install required packages
-  ansible.builtin.apt:
-    name: gpg
-    update_cache: true
 
 - name: Copy hiyapyco apt keys
   ansible.builtin.copy:
