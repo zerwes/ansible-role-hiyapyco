@@ -1,35 +1,54 @@
 # vim: tabstop=2 expandtab shiftwidth=2 softtabstop=2 smartindent nu ft=yaml
 ---
 
-- name: Install required packages
-  ansible.builtin.apt:
-    name: gpg
-    update_cache: true
+- name: Install hiyapyco from the upstream repo
+  when: not (hiyapyco_use_original_deb_packages | bool)
+  block:
+    - name: Install required packages
+      ansible.builtin.apt:
+        name: gpg
+        update_cache: true
 
-- name: Remove hiyapyco apt repos
-  ansible.builtin.apt_repository:
-    repo: "{{ item.repo }}"
-    update_cache: true
-    state: absent
-    filename: hiyapyco
-  with_items: "{{ hiyapyco_remove_aptrepos }}"
+    - name: Remove hiyapyco apt repos
+      ansible.builtin.apt_repository:
+        repo: "{{ item.repo }}"
+        update_cache: true
+        state: absent
+        filename: hiyapyco
+      with_items: "{{ hiyapyco_remove_aptrepos }}"
 
-- name: Copy hiyapyco apt keys
-  ansible.builtin.copy:
-    src: "{{ item.key }}"
-    dest: "/usr/share/keyrings/{{ item.key }}"
-    owner: root
-    mode: '0644'
-  with_items: "{{ hiyapyco_aptrepos }}"
+    - name: Copy hiyapyco apt keys
+      ansible.builtin.copy:
+        src: "{{ item.key }}"
+        dest: "/usr/share/keyrings/{{ item.key }}"
+        owner: root
+        mode: '0644'
+      with_items: "{{ hiyapyco_aptrepos }}"
 
-- name: Create hiyapyco apt repos
-  ansible.builtin.apt_repository:
-    repo: "{{ item.repo }}"
-    update_cache: true
-    filename: hiyapyco
-  with_items: "{{ hiyapyco_aptrepos }}"
+    - name: Create hiyapyco apt repos
+      ansible.builtin.apt_repository:
+        repo: "{{ item.repo }}"
+        update_cache: true
+        filename: hiyapyco
+      with_items: "{{ hiyapyco_aptrepos }}"
+
+- name: Install the debian hiyapyco package
+  when: hiyapyco_use_original_deb_packages | bool
+  block:
+    - name: Remove hiyapyco apt repos
+      ansible.builtin.apt_repository:
+        repo: "{{ item.repo }}"
+        update_cache: true
+        state: absent
+        filename: hiyapyco
+      with_items: "{{ hiyapyco_remove_aptrepos + hiyapyco_aptrepos }}"
+    - name: Remove hiyapyco apt keys
+      ansible.builtin.file:
+        path: "/usr/share/keyrings/{{ item.key }}"
+        state: absent
+      with_items: "{{ hiyapyco_aptrepos }}"
 
 - name: Install hiyapyco packages
   ansible.builtin.apt:
     name: "{{ hiyapyco_packages }}"
-    update_cache: true
+    update_cache: "{{ hiyapyco_use_original_deb_packages | bool }}"
