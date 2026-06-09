@@ -25,8 +25,14 @@ jobs:
           - debian13
           - debian12
         include:
-          - ansible: latest
-            pip3deps: '"ansible>=13" "ansible-core>=2.20" molecule "molecule-plugins[docker]" yamllint ansible-lint requests==2.31.0'
+          #- ansible: latest
+          #  pip3deps: '"ansible>=14" "ansible-core>=2.21" molecule "molecule-plugins[docker]" yamllint ansible-lint requests==2.31.0'
+          #  pythonversion: 3.13.5
+          - ansible: 13
+            pip3deps: '"ansible>=13,<14" "ansible-core>=2.20,<2.21" molecule "molecule-plugins[docker]" yamllint ansible-lint requests==2.31.0'
+            pythonversion: 3.13.5
+          - ansible: 12
+            pip3deps: '"ansible>=12,<13" "ansible-core>=2.19,<2.20" molecule "molecule-plugins[docker]" yamllint ansible-lint requests==2.31.0'
             pythonversion: 3.13.5
           - ansible: pinned
             pip3deps: '"ansible==11.13.0" "ansible-core==2.18.15" "molecule-plugins[docker]" "yamllint==1.38.0" "ansible-lint==26.4.0"'
